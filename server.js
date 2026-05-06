@@ -1,5 +1,3 @@
-// backend -> server.js
-
 require("dotenv").config();
 
 const express = require("express");
@@ -11,48 +9,39 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// MongoDB Connect
+// MongoDB connect
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("DB Connected"))
-    .catch((err) => console.log("DB Error:", err));
+  .then(() => console.log("DB Connected"))
+  .catch(err => console.log("DB Error:", err));
 
 // Schema
 const Todo = mongoose.model("Todo", {
-    text: String
+  text: String
 });
 
-// GET all todos
+// GET
 app.get("/todos", (req, res) => {
-    Todo.find()
-        .then((data) => res.json(data))
-        .catch((err) => res.json(err));
+  Todo.find().then(data => res.json(data));
 });
 
-// ADD new todo
+// ADD
 app.post("/todos", (req, res) => {
-    const todo = new Todo({
-        text: req.body.text
-    });
+  const todo = new Todo({ text: req.body.text });
 
-    todo.save()
-        .then(() => {
-            res.json({ msg: "Todo Added Successfully" });
-        })
-        .catch((err) => res.json(err));
+  todo.save().then(() => {
+    res.json({ msg: "added" });
+  });
 });
 
-// DELETE todo by ID
-app.delete("/todos/:id", (req, res) => {
-    Todo.findByIdAndDelete(req.params.id)
-        .then(() => {
-            res.json({ msg: "Todo Deleted Successfully" });
-        })
-        .catch((err) => res.json(err));
+// DELETE
+app.post("/delete", (req, res) => {
+  Todo.deleteOne({ text: req.body.text })
+    .then(() => res.json({ msg: "deleted" }));
 });
 
 // PORT
 const PORT = process.env.PORT || 1000;
 
 app.listen(PORT, () => {
-    console.log("Server running on port " + PORT);
+  console.log("Server running on port " + PORT);
 });
